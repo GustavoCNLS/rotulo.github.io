@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ferramenta gratuita para gerar rótulos de embalagens artesanais prontos para imprimir.">
+    <title>Gerador de Rótulos Artesanais | Mousse & Doces</title>
+    
+    <!-- Importação de Fontes do Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Dancing+Script:wght@700&family=Lato:wght@300;400;700;900&family=Oswald:wght@500&family=Playfair+Display:wght@600&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS GERAIS DO SITE --- */
+        :root {
+            --primary-color: #5D4037;
+            --accent-color: #8D6E63;
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* --- PAINEL DE CONTROLE (SIDEBAR/TOPBAR) --- */
+        .controls-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 50px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #777;
+        }
+
+        input[type="text"], 
+        input[type="number"],
+        select, 
+        textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.1);
+        }
+
+        /* Inputs Especiais (Cor e Range) */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 35px;
+            height: 38px;
+            cursor: pointer;
+            background: none;
+            padding: 0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; border: 1px solid #ddd; }
+
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            cursor: pointer;
+        }
+        .checkbox-wrapper input { width: 18px; height: 18px; accent-color: var(--primary-color); }
+        .checkbox-wrapper span { font-size: 0.9rem; font-weight: 600; color: #444; }
+
+        /* Botões de Ação */
+        .actions-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            flex: 2;
+        }
+        .btn-primary:hover { background-color: #4e342e; box-shadow: 0 4px 12px rgba(93, 64, 55, 0.3); }
+
+        .btn-secondary {
+            background-color: #607d8b;
+            color: white;
+            flex: 1;
+        }
+        .btn-secondary:hover { background-color: #455a64; }
+
+        /* --- VISUALIZAÇÃO DA FOLHA (PREVIEW) --- */
+        .preview-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            width: 100%;
+        }
+
+        .sheet-container {
+            position: relative;
+            background-color: #fff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .sheet-badge {
+            position: absolute;
+            top: -35px;
+            left: 0;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* A FOLHA A4 */
+        .sheet {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            padding: 10mm; /* Controlado via JS */
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            justify-content: center;
+            gap: 4mm;
+            overflow: hidden;
+        }
+
+        /* --- COMPONENTE: RÓTULO LATERAL --- */
+        .label-side {
+            background-color: var(--bg-color, #dcb694);
+            display: flex;
+            position: relative;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        /* Guia de corte pontilhada (só aparece se necessário) */
+        .cut-guide {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 1px dashed rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+
+        .label-side .content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+            border: 2px solid var(--details-color, #3e2723);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .label-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+            padding-right: 10px;
+        }
+
+        .label-right {
+            text-align: center;
+            border-left: 2px solid var(--details-color, #3e2723);
+            color: var(--details-color, #3e2723);
+            padding-left: 10px;
+            min-width: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Tipografia Dinâmica */
+        .dynamic-title { margin: 0; line-height: 0.9; white-space: nowrap; }
+        .dynamic-subtitle { margin: 4px 0 0 0; line-height: 1; font-weight: normal; }
+        .dynamic-ingred { margin-top: 6px; line-height: 1.1; }
+
+        /* --- COMPONENTE: RÓTULO TAMPA --- */
+        .label-lid {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .lid-guide {
+            position: absolute;
+            width: 100%; height: 100%;
+            border: 1px dashed #ddd;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .lid-inner {
+            width: 94%;
+            height: 94%;
+            border: 2px solid var(--details-color, #000);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-color, transparent);
+            z-index: 1;
+        }
+
+        .qr-area {
+            width: 55%;
+            height: 55%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+        }
+        .qr-area img { width: 100%; height: 100%; object-fit: contain; }
+
+        /* --- IMPRESSÃO --- */
+        @media print {
+            body { background: none; margin: 0; padding: 0; display: block; }
+            header, .controls-container, .sheet-badge { display: none; }
+            .preview-area { gap: 0; }
+            .sheet-container { box-shadow: none; margin: 0; page-break-after: always; }
+            .sheet { margin: 0 auto; padding: 0; border: none; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+
+        /* Responsividade Mobile */
+        @media (max-width: 768px) {
+            .sheet {
+                /* Reduz o tamanho da folha na tela do celular para não quebrar o layout, 
+                   mas mantém as proporções para impressão */
+                transform: scale(0.45);
+                transform-origin: top left;
+                margin-bottom: -150mm; /* Compensar o espaço vazio do scale */
+            }
+            .sheet-container {
+                width: 100%;
+                overflow: hidden;
+                height: 140mm; /* Altura ajustada para visualização mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gerador de Rótulos</h1>
+        <p>Crie, personalize e imprima embalagens profissionais em casa.</p>
+    </header>
+
+    <!-- PAINEL DE CONTROLE -->
+    <div class="controls-container">
+        <div class="controls-grid">
+            
+            <!-- SEÇÃO 1: TEXTOS -->
+            <div class="section-title">1. Informações do Produto</div>
+            
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Título do Produto</label>
+                <input type="text" id="inTitle" value="MOUSSE DE CHOCOLATE" oninput="render()">
+            </div>
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Subtítulo</label>
+                <input type="text" id="inSub" value="ARTESANAL & CASEIRO" oninput="render()">
+            </div>
+            <div class="input-group" style="grid-column: span 4;">
+                <label>Ingredientes</label>
+                <textarea id="inIngred" rows="2" oninput="render()">Ingredientes: Leite Integral, Ovos, Chocolate, Melaço.</textarea>
+            </div>
+            <div class="input-group">
+                <label>Volume</label>
+                <input type="text" id="inVol" value="200ml" oninput="render()">
+            </div>
+            <div class="input-group">
+                <label>Preço</label>
+                <input type="text" id="inPrice" value="R$ 8,00" oninput="render()">
+            </div>
+
+            <!-- SEÇÃO 2: TIPOGRAFIA & CORES -->
+            <div class="section-title">2. Estilo Visual</div>
+
+            <!-- Config Título -->
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Título: Fonte & Cor</label>
+                <div class="color-row">
+                    <input type="color" id="cTitle" value="#3e2723" oninput="render()">
+                    <select id="fTitle" onchange="render()" style="flex:1">
+                        <option value="'Amatic SC', cursive">Rústica (Amatic)</option>
+                        <option value="'Lato', sans-serif">Moderna (Lato)</option>
+                        <option value="'Playfair Display', serif">Elegante (Playfair)</option>
+                        <option value="'Oswald', sans-serif">Forte (Oswald)</option>
+                        <option value="'Dancing Script', cursive">Manuscrita</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Tamanho Título</label>
+                <input type="number" id="sTitle" value="38" oninput="render()">
+            </div>
+
+            <!-- Config Subtítulo -->
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Subtítulo: Fonte & Cor</label>
+                <div class="color-row">
+                    <input type="color" id="cSub" value="#5d4037" oninput="render()">
+                    <select id="fSub" onchange="render()" style="flex:1">
+                        <option value="'Lato', sans-serif">Moderna (Lato)</option>
+                        <option value="'Amatic SC', cursive">Rústica (Amatic)</option>
+                        <option value="'Roboto Mono', monospace">Técnica (Mono)</option>
+                        <option value="'Dancing Script', cursive">Manuscrita</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Tamanho Sub.</label>
+                <input type="number" id="sSub" value="16" oninput="render()">
+            </div>
+
+            <!-- Config Detalhes -->
+            <div class="input-group">
+                <label>Cor Ingredientes</label>
+                <input type="color" id="cIngred" value="#000000" oninput="render()" style="width:100%">
+            </div>
+            <div class="input-group">
+                <label>Cor Detalhes (Bordas)</label>
+                <input type="color" id="cDet" value="#3e2723" oninput="render()" style="width:100%">
+            </div>
+
+            <!-- Config Fundo -->
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Cor de Fundo do Rótulo</label>
+                <div class="color-row">
+                    <input type="color" id="pickerBg" value="#dcb694" oninput="syncBg('picker')">
+                    <input type="text" id="textBg" value="#dcb694" oninput="syncBg('text')" style="flex:1; text-transform:uppercase;">
+                </div>
+            </div>
+            <div class="input-group" style="grid-column: span 2; justify-content: flex-end;">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="checkTransparent" onchange="render()">
+                    <span>Fundo Transparente (Eco-Print)</span>
+                </label>
+            </div>
+
+            <!-- SEÇÃO 3: DIMENSÕES -->
+            <div class="section-title">3. Layout & Impressão</div>
+
+            <div class="input-group">
+                <label>Largura Lateral (mm)</label>
+                <input type="number" id="dimW" value="190" oninput="render()">
+            </div>
+            <div class="input-group">
+                <label>Altura Lateral (mm)</label>
+                <input type="number" id="dimH" value="45" oninput="render()">
+            </div>
+            <div class="input-group">
+                <label>Diâmetro Tampa (mm)</label>
+                <input type="number" id="dimLid" value="65" oninput="render()">
+            </div>
+            <div class="input-group">
+                <label>Qtd. Laterais</label>
+                <input type="number" id="qtySide" value="5" oninput="render()">
+            </div>
+            <div class="input-group">
+                <label>Qtd. Tampas</label>
+                <input type="number" id="qtyLid" value="8" oninput="render()">
+            </div>
+
+            <div class="input-group" style="grid-column: span 4;">
+                <label>Margem Lateral da Página: <span id="marginVal">10mm</span></label>
+                <input type="range" id="rangeMargin" min="0" max="50" value="10" oninput="render()">
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="actions-row">
+                <button class="btn btn-secondary" onclick="document.getElementById('fileQr').click()">
+                    <span>📷 Carregar QR Code</span>
+                </button>
+                <input type="file" id="fileQr" accept="image/*" onchange="loadQR(event)" style="display:none">
+                
+                <button class="btn btn-primary" onclick="window.print()">
+                    <span>🖨️ Imprimir Projeto</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <div class="preview-area">
+        
+        <!-- FOLHA 1 -->
+        <div class="sheet-container">
+            <div class="sheet-badge">Folha 1: Rótulos Laterais</div>
+            <div id="sheetSide" class="sheet"></div>
+        </div>
+
+        <!-- FOLHA 2 -->
+        <div class="sheet-container">
+            <div class="sheet-badge">Folha 2: Tampas</div>
+            <div id="sheetLid" class="sheet"></div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT (LÓGICA) -->
+    <script>
+        let qrData = null;
+
+        function render() {
+            // --- 1. CAPTURAR VALORES ---
+            const data = {
+                title: document.getElementById('inTitle').value,
+                sub: document.getElementById('inSub').value,
+                ingred: document.getElementById('inIngred').value,
+                vol: document.getElementById('inVol').value,
+                price: document.getElementById('inPrice').value,
+                
+                // Fontes
+                fTitle: document.getElementById('fTitle').value,
+                fSub: document.getElementById('fSub').value,
+                
+                // Tamanhos
+                sTitle: document.getElementById('sTitle').value + 'px',
+                sSub: document.getElementById('sSub').value + 'px',
+                
+                // Cores
+                cTitle: document.getElementById('cTitle').value,
+                cSub: document.getElementById('cSub').value,
+                cIngred: document.getElementById('cIngred').value,
+                cDet: document.getElementById('cDet').value,
+                cBgRaw: document.getElementById('textBg').value,
+                isTrans: document.getElementById('checkTransparent').checked,
+                
+                // Dims
+                dimW: document.getElementById('dimW').value + 'mm',
+                dimH: document.getElementById('dimH').value + 'mm',
+                dimLid: document.getElementById('dimLid').value + 'mm',
+                qtySide: document.getElementById('qtySide').value,
+                qtyLid: document.getElementById('qtyLid').value,
+                
+                margin: document.getElementById('rangeMargin').value
+            };
+
+            // Processar cor de fundo
+            const finalBg = data.isTrans ? 'transparent' : data.cBgRaw;
+
+            // Atualizar Label de Margem
+            document.getElementById('marginVal').textContent = data.margin + 'mm';
+            
+            // Aplicar Margem às Folhas
+            document.querySelectorAll('.sheet').forEach(el => {
+                el.style.padding = `10mm ${data.margin}mm`;
+            });
+
+            // --- 2. GERAR RÓTULOS LATERAIS ---
+            const sheetSide = document.getElementById('sheetSide');
+            let htmlSide = '';
+
+            for(let i=0; i<data.qtySide; i++) {
+                htmlSide += `
+                <div class="label-side" style="
+                    width: ${data.dimW}; 
+                    height: ${data.dimH}; 
+                    --bg-color: ${finalBg}; 
+                    --details-color: ${data.cDet};
+                ">
+                    <div class="cut-guide"></div>
+                    <div class="content">
+                        <div class="label-left">
+                            <h2 class="dynamic-title" style="font-family: ${data.fTitle}; font-size: ${data.sTitle}; color: ${data.cTitle};">${data.title}</h2>
+                            <h3 class="dynamic-subtitle" style="font-family: ${data.fSub}; font-size: ${data.sSub}; color: ${data.cSub};">${data.sub}</h3>
+                            <p class="dynamic-ingred" style="font-size: 9px; color: ${data.cIngred};">${data.ingred}</p>
+                        </div>
+                        <div class="label-right">
+                            <span style="font-size:8px; font-weight:700; text-transform:uppercase;">Peso Liq.</span>
+                            <div style="font-size:16px; font-weight:800;">${data.vol}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+            sheetSide.innerHTML = htmlSide;
+
+            // --- 3. GERAR TAMPAS ---
+            const sheetLid = document.getElementById('sheetLid');
+            let htmlLid = '';
+
+            for(let i=0; i<data.qtyLid; i++) {
+                htmlLid += `
+                <div class="label-lid" style="
+                    width: ${data.dimLid}; 
+                    height: ${data.dimLid};
+                ">
+                    <div class="lid-guide"></div>
+                    <div class="lid-inner" style="
+                        --bg-color: ${finalBg}; 
+                        --details-color: ${data.cDet};
+                    ">
+                        <div style="font-size:8px; font-weight:800; text-transform:uppercase; color:${data.cDet}; margin-bottom:2px;">Escaneie</div>
+                        <div class="qr-area">
+                            ${qrData ? `<img src="${qrData}">` : '<span style="font-size:9px; color:#ccc;">QR CODE</span>'}
+                        </div>
+                        <div style="font-size:12px; font-weight:800; background:${data.cDet}; color:#fff; padding:2px 8px; border-radius:10px; margin-top:2px;">
+                            ${data.price}
+                        </div>
+                    </div>
+                </div>`;
+            }
+            sheetLid.innerHTML = htmlLid;
+        }
+
+        // --- FUNÇÕES AUXILIARES ---
+        
+        function syncBg(source) {
+            const picker = document.getElementById('pickerBg');
+            const text = document.getElementById('textBg');
+            if(source === 'picker') text.value = picker.value;
+            else picker.value = text.value;
+            render();
+        }
+
+        function loadQR(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    qrData = e.target.result;
+                    render();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Iniciar
+        window.onload = render;
+    </script>
+</body>
+</html>
